@@ -1,17 +1,57 @@
-%% Case Study 2
-%% 1 a,b) Triangular Pulse
-fs = 10/0.1;
-t = -0.1:1/fs:0.1;
-w = 0.1;
-p_t = tripuls(t,w*2);
+% Case Study 2
+% Leandre Pestcoe and Julianne Wegmann
+% ESE 351: Signals and Systems
+% Created on: 4/20/21, Last Edited on: 4/20/21
 
-% rectangular pulse
-N =50.5;
-rect= zeros(1,2*N);
-for i=1:N+1
-    rect(i)=1
+%% Define pulse shape
+Ts = 0.1; %symbol period (rate 1/Ts)
+dt = 0.01; %sample period
+w = 5*Ts; %width
+t = -w:dt:w; %time vector
+fs = 1/dt; %sample frequency
+
+%sinc
+%sinc = sinc(t/Ts); %define sinc
+
+%triangular pulse
+triang = tripuls(t,w*2);
+
+%rectangular pulse
+rect = zeros(1,length(t));
+for i=(1:length(t)/2)
+    rect(i)=1;
 end
-figure, stem(rect);
+
+%decide which signal to use for simulation
+signal = rect;
+
+figure, plot(t,signal);
+xlabel('time (s)'), ylabel('x(t)'), title('Truncated Signal')
+
+%% Signal Modulation
+wc = 2*pi*20; %20 Hz modulation
+mod_signal = signal.*cos(wc*t);
+
+figure
+subplot(2,1,1), plot(t,mod_signal), grid on;
+xlabel('time (s)'), ylabel('y(t)'), title('Modulated Signal')
+
+Nfft = 1024; %length of fft
+f = (0:fs/Nfft:fs-fs/Nfft);
+subplot(2,1,2), plot(f,abs(fft(mod_signal,Nfft))), grid on;
+xlabel('frequency (Hz)'), ylabel('|Y(j\omega)|');
+
+%% Signal Demodulation
+demod_signal = mod_signal.*cos(wc*t);
+
+figure
+subplot(2,1,1), plot(t,demod_signal), grid on;
+xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+
+f = (0:fs/Nfft:fs-fs/Nfft);
+subplot(2,1,2), plot(f,abs(fft(demod_signal,Nfft))), grid on;
+xlabel('frequency (Hz)'), ylabel('|X_r(j\omega)|')
+
 %%
 % c) binary message 
 N = 10;
@@ -109,64 +149,3 @@ for k=1:10
     end
 end
 error_matched = (10-correct)/10;
-%%
-% modulated rect
-Ts = .1; % symbol period (rate 1/Ts)
-dt = .01; % sample period 
-t = -5*Ts:dt:5*Ts; % time vector
-wc = 2*pi*20; %20 Hz modulation
-modrect = rect.*cos(wc*t);
-
-% modulated rect and fft
-figure
-subplot(2,1,1), plot(t,modrect), grid on;
-xlabel('time (s)'), ylabel('y(t)'), title('Modulated rectangle')
-fs = 1/dt; % sample frequency
-Rfft = 1024; % length of fft
-f = [0:fs/Nfft:fs-fs/Nfft];
-subplot(2,1,2), plot(f,abs(fft(modrect,Nfft))), grid on;
-xlabel('frequency (Hz)'), ylabel('|Y(j\omega)|');
-
-% demodulated rect
-demodrect = modrect.*cos(wc*t);
-figure
-subplot(2,1,1), plot(t,demodrect), grid on;
-xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
-fs = 1/dt; % sample frequency
-Nfft = 1024; % length of fft
-f = [0:fs/Nfft:fs-fs/Nfft];
-subplot(2,1,2), plot(f,abs(fft(demodrect,Nfft))), grid on;
-xlabel('frequency (Hz)'), ylabel('|X_r(j\omega)|')
-
-% sinc
-x_sinc = sinc(t/Ts); % define sinc
-figure
-subplot(2,1,1), plot(t,x_sinc)
-xlabel('time (s)'), ylabel('x(t)'), title('Truncated sinc')
-fs = 1/dt; % sample frequency
-Nfft = 1024; % length of fft
-f = [0:fs/Nfft:fs-fs/Nfft];
-subplot(2,1,2), plot(f,abs(fft(x_sinc,Nfft)))
-xlabel('frequency (Hz)'), ylabel('|X(j\omega)|')
-
-% modulated sinc
-y_sinc = x_sinc.*cos(wc*t);
-figure
-subplot(2,1,1), plot(t,y_sinc)
-xlabel('time (s)'), ylabel('y(t)'), title('Modulated sinc')
-fs = 1/dt; % sample frequency
-Nfft = 1024; % length of fft
-f = [0:fs/Nfft:fs-fs/Nfft];
-subplot(2,1,2), plot(f,abs(fft(y_sinc,Nfft)))
-xlabel('frequency (Hz)'), ylabel('|Y(j\omega)|')
-
-% demodulated sinc
-xr_sinc = y_sinc.*cos(wc*t);
-figure
-subplot(2,1,1), plot(t,xr_sinc)
-xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
-fs = 1/dt; % sample frequency
-Nfft = 1024; % length of fft
-f = [0:fs/Nfft:fs-fs/Nfft];
-subplot(2,1,2), plot(f,abs(fft(xr_sinc,Nfft)))
-xlabel('frequency (Hz)'), ylabel('|X_r(j\omega)|')
