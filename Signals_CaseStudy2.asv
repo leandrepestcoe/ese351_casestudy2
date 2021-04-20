@@ -117,7 +117,7 @@ t = -5*Ts:dt:5*Ts; % time vector
 wc = 2*pi*20; %20 Hz modulation
 modrect = rect.*cos(wc*t);
 
-% modulated rect and fft
+% fft an
 figure
 subplot(2,1,1), plot(t,modrect), grid on;
 xlabel('time (s)'), ylabel('y(t)'), title('Modulated rectangle')
