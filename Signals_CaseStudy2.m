@@ -22,6 +22,12 @@ p_t = sinc_p_t;
 figure, plot(t,p_t), grid on;
 xlabel('time (s)'), ylabel('p(t)'), title('Truncated Signal p(t)')
 
+%% Text Message
+
+message = 'Case study 2 rocks!';
+binary = str2num(reshape(dec2bin(message)',1,[])');
+messageOut = char(bin2dec(num2str(reshape(binary,7,[])')))';
+
 %% Nyquist Criteria
 
 Nfft = 1024; %length of fft
@@ -43,25 +49,57 @@ bits2 = 2*((rand(1,N)>0.5)-0.5);
 bits3 = 2*((rand(1,N)>0.5)-0.5);
 
 x_t1 = zeros(1,N*(Ts/dt));
+x_t2 = zeros(1,N*(Ts/dt));
+x_t3 = zeros(1,N*(Ts/dt));
+
 for i=1:length(bits1)
     x_t1((i-1)*(Ts/dt)+1)=bits1(i);
 end
+for i=1:length(bits2)
+    x_t2((i-1)*(Ts/dt)+1)=bits2(i);
+end
+for i=1:length(bits3)
+    x_t3((i-1)*(Ts/dt)+1)=bits3(i);
+end
+
 y_t1 = conv(x_t1,p_t);
+y_t2 = conv(x_t2,p_t);
+y_t3 = conv(x_t3,p_t);
+
 t = (0:length(y_t1)-1)*dt;
-x_new = zeros(1,length(y_t1));
-x_new((length(p_t)+1)/2:(length(x_t1)+(length(p_t)+1)/2)-1) = x_t1;
+
+x_new1 = zeros(1,length(y_t1));
+x_new1((length(p_t)+1)/2:(length(x_t1)+(length(p_t)+1)/2)-1) = x_t1;
+x_new2 = zeros(1,length(y_t2));
+x_new2((length(p_t)+1)/2:(length(x_t2)+(length(p_t)+1)/2)-1) = x_t2;
+x_new3 = zeros(1,length(y_t3));
+x_new3((length(p_t)+1)/2:(length(x_t3)+(length(p_t)+1)/2)-1) = x_t3;
 
 figure();
-plot(t,y_t1), grid on;
+subplot(3,1,1), plot(t,y_t1), grid on;
 hold on
-stem(t,x_new);
-title('Transmitted Signal y(t)');
-xlabel('Time[s]');
-ylabel('y(t)');
+stem(t,x_new1);
+title('Transmitted Signal y(t) 1'),xlabel('Time[s]'),ylabel('y(t)');
+subplot(3,1,2), plot(t,y_t2), grid on;
+hold on
+stem(t,x_new2);
+title('Transmitted Signal y(t) 2'),xlabel('Time[s]'),ylabel('y(t)');
+subplot(3,1,3), plot(t,y_t3), grid on;
+hold on
+stem(t,x_new3);
+title('Transmitted Signal y(t) 3'),xlabel('Time[s]'),ylabel('y(t)');
 
 %% Signal Modulation (Up-Conversion)
 wc20 = 2*pi*20; %20 Hz modulation
-mod_signal20 = y_t1.*cos(wc*t);
+mod_signal20 = y_t1.*cos(wc20*t);
+
+wc30 = 2*pi*30; %30 Hz modulation
+mod_signal30 = y_t2.*cos(wc30*t);
+
+wc40 = 2*pi*40; %40 Hz modulation
+mod_signal40 = y_t3.*cos(wc40*t);
+
+mod_signal = mod_signal20 + mod_signal30 + mod_signal40;
 
 figure
 subplot(2,1,1), plot(t,mod_signal), grid on;
@@ -83,7 +121,7 @@ xlabel('Time[s]');
 ylabel('Amplitude');
 
 %% Signal Demodulation (Down-Conversion)
-demod_signal = r_t.*cos(wc*t);
+demod_signal = r_t.*cos(wc20*t);
 
 figure
 subplot(2,1,1), plot(t,demod_signal), grid on;
