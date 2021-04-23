@@ -26,7 +26,15 @@ xlabel('time (s)'), ylabel('p(t)'), title('Truncated Signal p(t)')
 
 message = 'Case study 2 rocks!';
 binary = str2num(reshape(dec2bin(message)',1,[])');
-messageOut = char(bin2dec(num2str(reshape(binary,7,[])')))';
+
+N_message = length(binary);
+
+x_message = zeros(1,N_message*(Ts/dt));
+
+for i=1:length(bits1)
+    x_message((i-1)*(Ts/dt)+1)=binary(i);
+end
+%messageOut = char(bin2dec(num2str(reshape(binary,7,[])')))';
 
 %% Nyquist Criteria
 
@@ -75,7 +83,7 @@ x_new2((length(p_t)+1)/2:(length(x_t2)+(length(p_t)+1)/2)-1) = x_t2;
 x_new3 = zeros(1,length(y_t3));
 x_new3((length(p_t)+1)/2:(length(x_t3)+(length(p_t)+1)/2)-1) = x_t3;
 
-x_t = [x_t1,x_t2,x_t3];
+x_new = [x_new1,x_new2,x_new3];
 
 figure();
 subplot(3,1,1), plot(t,y_t1), grid on;
@@ -94,6 +102,8 @@ title('Transmitted Signal y(t) 3'),xlabel('Time[s]'),ylabel('y(t)');
 y_t = [y_t1,y_t2,y_t3];
 figure();
 plot(y_t);
+hold on;
+stem(x_new);
 
 %% Signal Modulation (Up-Conversion)
 wc20 = 2*pi*20; %20 Hz modulation
