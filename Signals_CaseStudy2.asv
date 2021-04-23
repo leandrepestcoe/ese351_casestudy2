@@ -166,20 +166,20 @@ z_t = conv(r_t,p_neg);
 for i=1:length(z_t)
     for j = 1:Ts/dt:length(xn_tilda)
         if z_t(i)<=0
-            xn_tilda(j)=-1;
+            xn_tilda(i)=-1;
         else
-            xn_tilda(j)=1;
+            xn_tilda(i)=1;
         end
     end
 end
 
-incorrect_count = 0;
-for j=1:length(xn_tilda)
-    if x_t(j)~=xn_tilda(j)
-        incorrect_count = incorrect_count+1;
-    end
-end
-error = incorrect_count/length(x_t);
+% incorrect_count = 0;
+% for j=1:length(xn_tilda)
+%     if x_t(j)~=xn_tilda(j)
+%         incorrect_count = incorrect_count+1;
+%     end
+% end
+% error = incorrect_count/length(x_t);
 
 %plot(t,xn_tilda(1:length(t)));
 figure();
