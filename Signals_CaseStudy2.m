@@ -185,9 +185,7 @@ XV = fft(demod_signal20);
 P2 = abs(XV/length(demod_signal20));
 P1 = P2(1:length(demod_signal20)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,1,2),plot(f,P1);
-xlabel('f, Hz')
-ylabel('|X(f)|')
+subplot(2,1,2),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
 
 
 %% Lowpass Filter
@@ -208,7 +206,7 @@ xn_tilda = zeros(1,length(bits1));
 p_neg = p_t(end:-1:1);
 z_t = conv(demod_signal20,p_neg);
 for j=1:length(xn_tilda)
-   if z_t((j-1)*(Ts/dt)+1)<=0
+   if z_t((j-1)*(Ts/dt)+1+(length(p_t)+1)/2)<=0
        xn_tilda(j)=-1;
    else
        xn_tilda(j)=1;
