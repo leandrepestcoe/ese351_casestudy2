@@ -106,7 +106,7 @@ for i = 1:length(binary1)
     end
 end
 
-message2 = 'Signals and systems';
+message2 = 'I love signals and systems';
 binary2 = str2num(reshape(dec2bin(message2)',1,[])');
 for i = 1:length(binary2)
     if binary2(i)==0
@@ -114,7 +114,7 @@ for i = 1:length(binary2)
     end
 end
 
-message3 = 'Systems engineering';
+message3 = 'Hello goodbye';
 binary3 = str2num(reshape(dec2bin(message3)',1,[])');
 for i = 1:length(binary3)
     if binary3(i)==0
@@ -144,9 +144,9 @@ y_message2 = conv(x_message2, p_t);
 y_message3 = conv(x_message3, p_t);
 
 figure();
-plot(y_message2);
+plot(y_message1);
 hold on
-stem(x_message2);
+plot(
 
 
 %messageOut = char(bin2dec(num2str(reshape(binary,7,[])')))';
