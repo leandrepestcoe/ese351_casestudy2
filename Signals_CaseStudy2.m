@@ -259,6 +259,8 @@ for j=1:length(xn_tilda)
 end
 error = incorrect_count/length(bits1);
 
+t_new = (0:length(z_t)-1)*dt; %define new time vector
+
 figure();
 stem(bits1);
 hold on;
@@ -266,10 +268,40 @@ stem(xn_tilda);
 legend('bits1','xn tilda');
 
 figure();
-plot(z_t);
+plot(t_new,z_t);
 hold on
-stem(xn_spaced_new);
+stem(t_new,xn_spaced_new);
 
 %% Noise Levels and Error Rates
 
+error_matched = zeros(1,11);
+index = 1;
+for i = 0:0.1:1
+    sigma = i;
+    n = sigma*randn(1,length(y));
+    r = y(1:length(t))+n(1:length(t)); 
+    xn_tilda_matched = ones(1,length(t));
+    p_neg = p(end:-1:1);
+    z = conv(r,p_neg);
+    for j=1:length(z)
+        if z(j)<=0
+            xn_tilda_matched(j)=-1;
+        end
+    end
+    %calculate error rate for matched filter
+    incorrect_count_matched = 0;
+    for j=1:length(x)
+        if x(j)~=xn_tilda_matched(j)
+            incorrect_count_matched = incorrect_count_matched+1;
+        end
+    end
+    error_matched(index) = incorrect_count_matched/length(y);  
+    index = index+1;
+end
+
+figure();
+plot(sigma_vector,error_matched);
+title('Sigma Value vs. Error Rate for Matched Filter');
+xlabel('Sigma Value');
+ylabel('Error Rate');
 
