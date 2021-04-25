@@ -45,7 +45,7 @@ bits2 = 2*((rand(1,N)>0.5)-0.5);
 bits3 = 2*((rand(1,N)>0.5)-0.5);
 
 %spacing out bits
-xn1 =zeros(1,N*(Ts/dt));
+xn1 = zeros(1,N*(Ts/dt));
 xn2 = zeros(1,N*(Ts/dt));
 xn3 = zeros(1,N*(Ts/dt));
 
@@ -99,57 +99,88 @@ title('Transmitted Signal 3'),xlabel('Time[s]'),ylabel('y_3(t)');
 %% Text Message and Noise-free PAM Signal y(t)
 
 message1 = 'Case study 2 rocks!';
-binary1 = str2num(reshape(dec2bin(message1)',1,[])');
-for i = 1:length(binary1)
-    if binary1(i)==0
-        binary1(i)=-1;
+bits1 = str2num(reshape(dec2bin(message1)',1,[])');
+for i = 1:length(bits1)
+    if bits1(i)==0
+        bits1(i)=-1;
     end
 end
 
 message2 = 'Signals and systems';
-binary2 = str2num(reshape(dec2bin(message2)',1,[])');
-for i = 1:length(binary2)
-    if binary2(i)==0
-        binary2(i)=-1;
+bits2 = str2num(reshape(dec2bin(message2)',1,[])');
+for i = 1:length(bits2)
+    if bits2(i)==0
+        bits2(i)=-1;
     end
 end
 
 message3 = 'Systems engineering';
-binary3 = str2num(reshape(dec2bin(message3)',1,[])');
-for i = 1:length(binary3)
-    if binary3(i)==0
-        binary3(i)=-1;
+bits3 = str2num(reshape(dec2bin(message3)',1,[])');
+for i = 1:length(bits3)
+    if bits3(i)==0
+        bits3(i)=-1;
     end
 end
 
-N_message1 = length(binary1);
-N_message2 = length(binary2);
-N_message3 = length(binary3);
-x_message1 = zeros(1,N_message1*(Ts/dt));
-x_message2 = zeros(1,N_message2*(Ts/dt));
-x_message3 = zeros(1,N_message3*(Ts/dt));
+xn1 = zeros(1,length(bits1)*(Ts/dt));
+xn2 = zeros(1,length(bits2)*(Ts/dt));
+xn3 = zeros(1,length(bits3)*(Ts/dt));
 
-for i=1:length(binary1)
-    x_message1((i-1)*(Ts/dt)+1)=binary1(i);
+for i=1:length(bits1)
+    xn1((i-1)*(Ts/dt)+1)=bits1(i);
 end
-for i=1:length(binary2)
-    x_message2((i-1)*(Ts/dt)+1)=binary2(i);
+for i=1:length(bits2)
+    xn2((i-1)*(Ts/dt)+1)=bits2(i);
 end
-for i=1:length(binary3)
-    x_message3((i-1)*(Ts/dt)+1)=binary3(i);
+for i=1:length(bits3)
+    xn3((i-1)*(Ts/dt)+1)=bits3(i);
 end
 
-y_message1 = conv(x_message1, p_t);
-y_message2 = conv(x_message2, p_t);
-y_message3 = conv(x_message3, p_t);
+y_t1 = conv(xn1, p_t);
+y_t2 = conv(xn2, p_t);
+y_t3 = conv(xn3, p_t);
+
+%make sure all of the signals are same length
+if length(y_t1)>length(y_t2)
+    y_t2 = [y_t2,zeros(1,length(y_t1)-length(y_t2))];
+    if length(y_t2)>length(y_t3)
+        y_t3 = [y_t3,zeros(1,length(y_t2)-length(y_t3))];
+    else
+        y_t2 = [y_t2,zeros(1,length(y_t3)-length(y_t2))];
+    end
+else
+    y_t1 = [y_t1,zeros(1,length(y_t2)-length(y_t1))];
+    if length(y_t1)>length(y_t3)
+        y_t3 = [y_t3,zeros(1,length(y_t1)-length(y_t3))];
+    else
+        y_t1 = [y_t1,zeros(1,length(y_t3)-length(y_t1))];
+    end
+end
+
+N = length(y_t1)/(Ts/dt)-(Ts/dt);
+t = (0:length(y_t1)-1)*dt; %define new time vector
+
+%shift x so lines up with y(t) on graph
+x_new1 = zeros(1,length(y_t1));
+x_new1((length(p_t)+1)/2:(length(xn1)+(length(p_t)+1)/2)-1) = xn1;
+x_new2 = zeros(1,length(y_t2));
+x_new2((length(p_t)+1)/2:(length(xn2)+(length(p_t)+1)/2)-1) = xn2;
+x_new3 = zeros(1,length(y_t3));
+x_new3((length(p_t)+1)/2:(length(xn3)+(length(p_t)+1)/2)-1) = xn3;
 
 figure();
-plot(y_message2);
+subplot(3,1,1), plot(t,y_t1), grid on;
 hold on
-stem(x_message2);
-
-
-%messageOut = char(bin2dec(num2str(reshape(binary,7,[])')))';
+stem(t,x_message_new1);
+title('Transmitted Signal 1'),xlabel('Time[s]'),ylabel('y_1(t)');
+subplot(3,1,2), plot(t,y_t2), grid on;
+hold on
+stem(t,x_message_new2);
+title('Transmitted Signal 2'),xlabel('Time[s]'),ylabel('y_2(t)');
+subplot(3,1,3), plot(t,y_t3), grid on;
+hold on
+stem(t,x_message_new3);
+title('Transmitted Signal 3'),xlabel('Time[s]'),ylabel('y_3(t)');
 
 %% Signal Modulation (Up-Conversion)
 wc20 = 2*pi*20; %20 Hz modulation
@@ -163,6 +194,7 @@ mod_signal40 = y_t3.*cos(wc40*t);
 
 mod_signal = mod_signal20+mod_signal30+mod_signal40;
 
+%plot the combined modulated signal
 figure
 subplot(2,1,1), plot(mod_signal), grid on;
 xlabel('time (s)'), ylabel('y(t)cos(wc*t)'), title('Modulated Signal')
@@ -176,12 +208,31 @@ subplot(2,1,2),plot(f,P1);
 xlabel('frequency[Hz]')
 ylabel('|Y(j\omega)|')
 
-% eventually plot all transforms separately so can see all messages...
+%plot three signals separately
+figure
+subplot(2,3,1),plot(mod_signal20),grid on;
+f = (0:length(mod_signal20)/2)*fs/length(mod_signal20);
+XV = fft(mod_signal20);
+P2 = abs(XV/length(mod_signal20));
+P1 = P2(1:length(mod_signal20)/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+subplot(2,3,4),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
 
-% figure
-% subplot(3,1,1),plot(mod_signal20),grid on;
-% subplot(3,1,2),plot(mod_signal30),grid on;
-% subplot(3,1,3),plot(mod_signal40),grid on;
+subplot(2,3,2),plot(mod_signal30),grid on;
+f = (0:length(mod_signal30)/2)*fs/length(mod_signal30);
+XV = fft(mod_signal30);
+P2 = abs(XV/length(mod_signal30));
+P1 = P2(1:length(mod_signal30)/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+subplot(2,3,5),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
+
+subplot(2,3,3),plot(mod_signal40),grid on;
+f = (0:length(mod_signal40)/2)*fs/length(mod_signal40);
+XV = fft(mod_signal40);
+P2 = abs(XV/length(mod_signal40));
+P1 = P2(1:length(mod_signal40)/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+subplot(2,3,6),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
 
 
 %% Noisy Recieved Signal r(t)
@@ -201,8 +252,9 @@ demod_signal20 = r_t.*cos(wc20*t);
 demod_signal30 = r_t.*cos(wc30*t);
 demod_signal40 = r_t.*cos(wc40*t);
 
+%plot demod_signal20
 figure
-subplot(2,1,1), plot(demod_signal20), grid on;
+subplot(2,3,1), plot(demod_signal20), grid on;
 xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
 
 f = (0:length(demod_signal20)/2)*fs/length(demod_signal20);
@@ -210,7 +262,29 @@ XV = fft(demod_signal20);
 P2 = abs(XV/length(demod_signal20));
 P1 = P2(1:length(demod_signal20)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,1,2),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+subplot(2,3,4),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+
+%plot demod_signal30
+subplot(2,3,2), plot(demod_signal30), grid on;
+xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+
+f = (0:length(demod_signal30)/2)*fs/length(demod_signal30);
+XV = fft(demod_signal30);
+P2 = abs(XV/length(demod_signal30));
+P1 = P2(1:length(demod_signal30)/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+subplot(2,3,5),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+
+%plot demod_signal40
+subplot(2,3,3), plot(demod_signal40), grid on;
+xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+
+f = (0:length(demod_signal40)/2)*fs/length(demod_signal40);
+XV = fft(demod_signal40);
+P2 = abs(XV/length(demod_signal40));
+P1 = P2(1:length(demod_signal40)/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+subplot(2,3,6),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
 
 
 %% Lowpass Filter
@@ -271,6 +345,14 @@ figure();
 plot(t_new,z_t);
 hold on
 stem(t_new,xn_spaced_new);
+
+%% Recover text message
+for i = 1:length(xn_tilda)
+    if xn_tilda(i)==-1
+        xn_tilda(i)=0;
+    end
+end
+messageOut = char(bin2dec(num2str(reshape(xn_tilda,7,[])')))';
 
 %% Noise Levels and Error Rates
 
