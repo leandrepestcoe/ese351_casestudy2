@@ -1,12 +1,12 @@
 % Case Study 2
 % Leandre Pestcoe and Julianne Wegmann
 % ESE 351: Signals and Systems
-% Created on: 4/20/21, Last Edited on: 4/23/21
+% Created on: 4/20/21, Last Edited on: 4/26/21
 
 %% Define Pulse Shape p(t)
 Ts = 0.1; %symbol period (rate 1/Ts)
 dt = 0.01; %sample period
-w = 5*Ts; %width
+w = 1*Ts; %width
 t = -w:dt:w; %time vector
 fs = 1/dt; %sample frequency
 
@@ -17,7 +17,7 @@ sinc_p_t = sinc(t/Ts); %define sinc
 triang_p_t = tripuls(t,w*2);
 
 %decide which signal to use for simulation
-p_t = sinc_p_t;
+p_t = triang_p_t;
 
 figure, plot(t,p_t), grid on;
 xlabel('time (s)'), ylabel('p(t)'), title('Truncated Signal p(t)')
@@ -171,15 +171,15 @@ x_new3((length(p_t)+1)/2:(length(xn3)+(length(p_t)+1)/2)-1) = xn3;
 figure();
 subplot(3,1,1), plot(t,y_t1), grid on;
 hold on
-stem(t,x_message_new1);
+stem(t,x_new1);
 title('Transmitted Signal 1'),xlabel('Time[s]'),ylabel('y_1(t)');
 subplot(3,1,2), plot(t,y_t2), grid on;
 hold on
-stem(t,x_message_new2);
+stem(t,x_new2);
 title('Transmitted Signal 2'),xlabel('Time[s]'),ylabel('y_2(t)');
 subplot(3,1,3), plot(t,y_t3), grid on;
 hold on
-stem(t,x_message_new3);
+stem(t,x_new3);
 title('Transmitted Signal 3'),xlabel('Time[s]'),ylabel('y_3(t)');
 
 %% Signal Modulation (Up-Conversion)
@@ -236,7 +236,7 @@ subplot(2,3,6),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on
 
 
 %% Noisy Recieved Signal r(t)
-sigma = 0.5;
+sigma = 0.4;
 n_t = sigma*randn(1,length(mod_signal));
 r_t = mod_signal + n_t;
 
@@ -343,17 +343,17 @@ for i=1:length(xn_tilda2)
     xn_spaced2((i-1)*(Ts/dt)+1)=xn_tilda2(i);
 end
 xn_spaced3 = zeros(1,N*(Ts/dt));
-for i=1:length(xn_tilda)
+for i=1:length(xn_tilda3)
     xn_spaced3((i-1)*(Ts/dt)+1)=xn_tilda3(i);
 end
 
 %shift xn_spaced
 xn_spaced_new1 = zeros(1,length(z_t1));
-xn_spaced_new1((2*length(p_t)+1)/2:(length(xn1)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new1((2*length(p_t)+1)/2:(length(xn1)+(2*length(p_t)+1)/2)-1) = xn_spaced1;
 xn_spaced_new2 = zeros(1,length(z_t2));
-xn_spaced_new2((2*length(p_t)+1)/2:(length(xn2)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new2((2*length(p_t)+1)/2:(length(xn2)+(2*length(p_t)+1)/2)-1) = xn_spaced2;
 xn_spaced_new3 = zeros(1,length(z_t3));
-xn_spaced_new3((2*length(p_t)+1)/2:(length(xn3)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new3((2*length(p_t)+1)/2:(length(xn3)+(2*length(p_t)+1)/2)-1) = xn_spaced3;
 
 %calculate error rate
 incorrect_count1 = 0;
@@ -392,37 +392,75 @@ hold on
 stem(t_new,xn_spaced_new2);
 
 %% Recover Text Message
-for i = 1:length(xn_tilda)
-    if xn_tilda(i)==-1
-        xn_tilda(i)=0;
+for i = 1:length(xn_tilda1)
+    if xn_tilda1(i)==-1
+        xn_tilda1(i)=0;
     end
 end
-messageOut = char(bin2dec(num2str(reshape(xn_tilda,7,[])')))';
+messageOut1 = char(bin2dec(num2str(reshape(xn_tilda1,7,[])')))';
+
+for i = 1:length(xn_tilda2)
+    if xn_tilda2(i)==-1
+        xn_tilda2(i)=0;
+    end
+end
+messageOut2 = char(bin2dec(num2str(reshape(xn_tilda2,7,[])')))';
+
+for i = 1:length(xn_tilda3)
+    if xn_tilda3(i)==-1
+        xn_tilda3(i)=0;
+    end
+end
+messageOut3 = char(bin2dec(num2str(reshape(xn_tilda3,7,[])')))';
+
+disp(messageOut1);
+disp(messageOut2);
+disp(messageOut3);
 
 %% Noise Levels and Error Rates
 
-error_matched = zeros(1,11);
+%random bit message
+error1 = [0,0,0,0,0,0,0,0,.1,.1,.1];
+error2 = [0,0,0,0,0,0,0,0,0,0,0];
+error3 = [0,0,0,0,0,0,0,0,.1,.1,.1];
+
+sigma = (0:0.1:1);
+
+figure,plot(sigma,error1);
+hold on
+plot(sigma,error2);
+hold on
+plot(sigma,error3);
+legend('1','2','3');
+
+
+%%
+
+
+error = zeros(1,N+1);
 index = 1;
 for i = 0:0.1:1
     sigma = i;
-    n = sigma*randn(1,length(y));
+    n = sigma*randn(1,length(mod_signal));
     r = y(1:length(t))+n(1:length(t)); 
     xn_tilda_matched = ones(1,length(t));
     p_neg = p(end:-1:1);
     z = conv(r,p_neg);
-    for j=1:length(z)
-        if z(j)<=0
-            xn_tilda_matched(j)=-1;
+    for j=1:length(xn_tilda1)
+        if z_t1((j-1)*(Ts/dt)+1+(length(p_t)+1))<=0
+            xn_tilda1(j)=-1;
+        else
+            xn_tilda1(j)=1;
         end
     end
     %calculate error rate for matched filter
-    incorrect_count_matched = 0;
-    for j=1:length(x)
-        if x(j)~=xn_tilda_matched(j)
-            incorrect_count_matched = incorrect_count_matched+1;
+    incorrect_count = 0;
+    for j=1:length(bits1)
+        if bits1(j)~=xn_tilda1(j)
+            incorrect_count = incorrect_count+1;
         end
     end
-    error_matched(index) = incorrect_count_matched/length(y);  
+    error(index) = incorrect_count/length(y);  
     index = index+1;
 end
 
