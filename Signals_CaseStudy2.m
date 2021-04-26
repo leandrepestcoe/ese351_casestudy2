@@ -6,7 +6,7 @@
 %% Define Pulse Shape p(t)
 Ts = 0.1; %symbol period (rate 1/Ts)
 dt = 0.01; %sample period
-w = 1*Ts; %width
+w = 5*Ts; %width
 t = -w:dt:w; %time vector
 fs = 1/dt; %sample frequency
 
@@ -17,7 +17,7 @@ sinc_p_t = sinc(t/Ts); %define sinc
 triang_p_t = tripuls(t,w*2);
 
 %decide which signal to use for simulation
-p_t = triang_p_t;
+p_t = sinc_p_t;
 
 figure, plot(t,p_t), grid on;
 xlabel('time (s)'), ylabel('p(t)'), title('Truncated Signal p(t)')
@@ -349,11 +349,11 @@ end
 
 %shift xn_spaced
 xn_spaced_new1 = zeros(1,length(z_t1));
-xn_spaced_new1((2*length(p_t)+1)/2:(length(xn1)+(2*length(p_t)+1)/2)-1) = xn_spaced1;
+xn_spaced_new1((2*length(p_t)+1)/2:(length(xn_spaced1)+(2*length(p_t)+1)/2)-1) = xn_spaced1;
 xn_spaced_new2 = zeros(1,length(z_t2));
-xn_spaced_new2((2*length(p_t)+1)/2:(length(xn2)+(2*length(p_t)+1)/2)-1) = xn_spaced2;
+xn_spaced_new2((2*length(p_t)+1)/2:(length(xn_spaced2)+(2*length(p_t)+1)/2)-1) = xn_spaced2;
 xn_spaced_new3 = zeros(1,length(z_t3));
-xn_spaced_new3((2*length(p_t)+1)/2:(length(xn3)+(2*length(p_t)+1)/2)-1) = xn_spaced3;
+xn_spaced_new3((2*length(p_t)+1)/2:(length(xn_spaced3)+(2*length(p_t)+1)/2)-1) = xn_spaced3;
 
 %calculate error rate
 incorrect_count1 = 0;
@@ -381,9 +381,9 @@ error3 = incorrect_count3/length(bits3);
 t_new = (0:length(z_t1)-1)*dt; %define new time vector
 
 figure();
-stem(bits2);
+stem(bits1);
 hold on;
-stem(xn_tilda2);
+stem(xn_tilda1);
 legend('bits','xn tilda');
 
 figure();
