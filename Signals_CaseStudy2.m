@@ -302,51 +302,96 @@ plot(filter_low);
 %% Matched Filter Receiver
 
 %generate z(t)
-xn_tilda = zeros(1,length(bits1));
+xn_tilda1 = zeros(1,length(bits1));
+xn_tilda2 = zeros(1,length(bits2));
+xn_tilda3 = zeros(1,length(bits3));
 p_neg = p_t(end:-1:1);
-z_t = conv(demod_signal20,p_neg);
+z_t1 = conv(demod_signal20,p_neg);
+z_t2 = conv(demod_signal30,p_neg);
+z_t3 = conv(demod_signal40,p_neg);
 
 %generate estimate xn_tilda
-for j=1:length(xn_tilda)
-   if z_t((j-1)*(Ts/dt)+1+(length(p_t)+1)/2)<=0
-       xn_tilda(j)=-1;
+for j=1:length(xn_tilda1)
+   if z_t1((j-1)*(Ts/dt)+1+(length(p_t)+1))<=0
+       xn_tilda1(j)=-1;
    else
-       xn_tilda(j)=1;
+       xn_tilda1(j)=1;
+   end
+end
+for j=1:length(xn_tilda2)
+   if z_t2((j-1)*(Ts/dt)+1+(length(p_t)+1))<=0
+       xn_tilda2(j)=-1;
+   else
+       xn_tilda2(j)=1;
+   end
+end
+for j=1:length(xn_tilda3)
+   if z_t3((j-1)*(Ts/dt)+1+(length(p_t)+1))<=0
+       xn_tilda3(j)=-1;
+   else
+       xn_tilda3(j)=1;
    end
 end
 
 %space out xn_tilda
-xn_spaced = zeros(1,N*(Ts/dt));
-for i=1:length(xn_tilda)
-    xn_spaced((i-1)*(Ts/dt)+1)=xn_tilda(i);
+xn_spaced1 = zeros(1,N*(Ts/dt));
+for i=1:length(xn_tilda1)
+    xn_spaced1((i-1)*(Ts/dt)+1)=xn_tilda1(i);
 end
+xn_spaced2 = zeros(1,N*(Ts/dt));
+for i=1:length(xn_tilda2)
+    xn_spaced2((i-1)*(Ts/dt)+1)=xn_tilda2(i);
+end
+xn_spaced3 = zeros(1,N*(Ts/dt));
+for i=1:length(xn_tilda)
+    xn_spaced3((i-1)*(Ts/dt)+1)=xn_tilda3(i);
+end
+
 %shift xn_spaced
-xn_spaced_new = zeros(1,length(z_t));
-xn_spaced_new((2*length(p_t)+1)/2:(length(xn1)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new1 = zeros(1,length(z_t1));
+xn_spaced_new1((2*length(p_t)+1)/2:(length(xn1)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new2 = zeros(1,length(z_t2));
+xn_spaced_new2((2*length(p_t)+1)/2:(length(xn2)+(2*length(p_t)+1)/2)-1) = xn_spaced;
+xn_spaced_new3 = zeros(1,length(z_t3));
+xn_spaced_new3((2*length(p_t)+1)/2:(length(xn3)+(2*length(p_t)+1)/2)-1) = xn_spaced;
 
 %calculate error rate
-incorrect_count = 0;
-for j=1:length(xn_tilda)
-    if bits1(j)~=xn_tilda(j)
-        incorrect_count = incorrect_count+1;
+incorrect_count1 = 0;
+for j=1:length(xn_tilda1)
+    if bits1(j)~=xn_tilda1(j)
+        incorrect_count1 = incorrect_count1+1;
     end
 end
-error = incorrect_count/length(bits1);
+error1 = incorrect_count1/length(bits1);
+incorrect_count2 = 0;
+for j=1:length(xn_tilda2)
+    if bits2(j)~=xn_tilda2(j)
+        incorrect_count2 = incorrect_count2+1;
+    end
+end
+error2 = incorrect_count2/length(bits2);
+incorrect_count3 = 0;
+for j=1:length(xn_tilda3)
+    if bits3(j)~=xn_tilda3(j)
+        incorrect_count3 = incorrect_count3+1;
+    end
+end
+error3 = incorrect_count3/length(bits3);
 
-t_new = (0:length(z_t)-1)*dt; %define new time vector
+t_new = (0:length(z_t1)-1)*dt; %define new time vector
 
 figure();
-stem(bits1);
+stem(bits2);
 hold on;
-stem(xn_tilda);
-legend('bits1','xn tilda');
+stem(xn_tilda2);
+legend('bits','xn tilda');
 
 figure();
-plot(t_new,z_t);
+plot(t_new,z_t2);
 hold on
-stem(t_new,xn_spaced_new);
+stem(t_new,xn_spaced_new2);
 
-%% Recover text message
+%% Recover Text Message
 for i = 1:length(xn_tilda)
     if xn_tilda(i)==-1
         xn_tilda(i)=0;
