@@ -20,7 +20,7 @@ triang_p_t = tripuls(t,w*2);
 p_t = sinc_p_t;
 
 figure, plot(t,p_t), grid on;
-xlabel('time (s)'), ylabel('p(t)'), title('Truncated Signal p(t)')
+xlabel('Time[s]'), ylabel('p(t)'), title('Truncated Signal p(t)')
 
 %% Nyquist Criteria
 
@@ -87,13 +87,6 @@ subplot(3,1,3), plot(t,y_t3), grid on;
 hold on
 stem(t,x_new3);
 title('Transmitted Signal 3'),xlabel('Time[s]'),ylabel('y_3(t)');
-
-
-%y_t = [y_t1,y_t2,y_t3];
-
-% figure(),plot(y_t),title('Transmitted Signal y(t)'),xlabel('Time[s]'),ylabel('y(t)');
-% hold on;
-% stem(x_new);
 
 
 %% Text Message and Noise-free PAM Signal y(t)
@@ -197,7 +190,7 @@ mod_signal = mod_signal20+mod_signal30+mod_signal40;
 %plot the combined modulated signal
 figure
 subplot(2,1,1), plot(mod_signal), grid on;
-xlabel('time (s)'), ylabel('y(t)cos(wc*t)'), title('Modulated Signal')
+xlabel('Time[s]'), ylabel('y(t)cos(wc*t)'), title('Modulated Signal with Three Messages')
 
 f = (0:length(mod_signal)/2)*fs/length(mod_signal);
 XV = fft(mod_signal);
@@ -205,34 +198,35 @@ P2 = abs(XV/length(mod_signal));
 P1 = P2(1:length(mod_signal)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
 subplot(2,1,2),plot(f,P1);
-xlabel('frequency[Hz]')
+xlabel('Frequency[Hz]')
 ylabel('|Y(j\omega)|')
 
 %plot three signals separately
 figure
-subplot(2,3,1),plot(mod_signal20),grid on;
+sgtitle('Individual Modulated Signals');
+subplot(2,3,1),plot(mod_signal20),title('Message 1'),grid on;
 f = (0:length(mod_signal20)/2)*fs/length(mod_signal20);
 XV = fft(mod_signal20);
 P2 = abs(XV/length(mod_signal20));
 P1 = P2(1:length(mod_signal20)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,4),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
+subplot(2,3,4),plot(f,P1),title('Modulated at 20Hz'),xlabel('Frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
 
-subplot(2,3,2),plot(mod_signal30),grid on;
+subplot(2,3,2),plot(mod_signal30),title('Message 2'),grid on;
 f = (0:length(mod_signal30)/2)*fs/length(mod_signal30);
 XV = fft(mod_signal30);
 P2 = abs(XV/length(mod_signal30));
 P1 = P2(1:length(mod_signal30)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,5),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
+subplot(2,3,5),plot(f,P1),title('Modulated at 30Hz'),xlabel('Frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
 
-subplot(2,3,3),plot(mod_signal40),grid on;
+subplot(2,3,3),plot(mod_signal40),title('Message 3'),grid on;
 f = (0:length(mod_signal40)/2)*fs/length(mod_signal40);
 XV = fft(mod_signal40);
 P2 = abs(XV/length(mod_signal40));
 P1 = P2(1:length(mod_signal40)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,6),plot(f,P1),xlabel('frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
+subplot(2,3,6),plot(f,P1),title('Modulated at 40Hz'),xlabel('Frequency[Hz]'),ylabel('|Y(j\omega)|'),grid on;
 
 
 %% Noisy Recieved Signal r(t)
@@ -254,37 +248,38 @@ demod_signal40 = r_t.*cos(wc40*t);
 
 %plot demod_signal20
 figure
+sgtitle('Individual Demodulated Signals');
 subplot(2,3,1), plot(demod_signal20), grid on;
-xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+xlabel('Time[s]'), ylabel('x_r(t)'), title('Message 1')
 
 f = (0:length(demod_signal20)/2)*fs/length(demod_signal20);
 XV = fft(demod_signal20);
 P2 = abs(XV/length(demod_signal20));
 P1 = P2(1:length(demod_signal20)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,4),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+subplot(2,3,4),plot(f,P1),title('Demodulated at 20 Hz'),xlabel('Frequency[Hz]'),ylabel('|X_r(j\omega)|'),grid on;
 
 %plot demod_signal30
 subplot(2,3,2), plot(demod_signal30), grid on;
-xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+xlabel('Time[s]'), ylabel('x_r(t)'), title('Message 2')
 
 f = (0:length(demod_signal30)/2)*fs/length(demod_signal30);
 XV = fft(demod_signal30);
 P2 = abs(XV/length(demod_signal30));
 P1 = P2(1:length(demod_signal30)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,5),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+subplot(2,3,5),plot(f,P1),title('Demodulated at 30 Hz'),xlabel('Frequency[Hz]'),ylabel('|X_r(j\omega)|'),grid on;
 
 %plot demod_signal40
 subplot(2,3,3), plot(demod_signal40), grid on;
-xlabel('time (s)'), ylabel('x_r(t)'), title('Demod (without LPF)')
+xlabel('Time[s]'), ylabel('x_r(t)'), title('Message 3')
 
 f = (0:length(demod_signal40)/2)*fs/length(demod_signal40);
 XV = fft(demod_signal40);
 P2 = abs(XV/length(demod_signal40));
 P1 = P2(1:length(demod_signal40)/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
-subplot(2,3,6),plot(f,P1),xlabel('f, Hz'),ylabel('|X_r(j\omega)|'),grid on;
+subplot(2,3,6),plot(f,P1),title('Demodulated at 40 Hz'),xlabel('Frequency[Hz]'),ylabel('|X_r(j\omega)|'),grid on;
 
 
 %% Lowpass Filter
@@ -381,15 +376,31 @@ error3 = incorrect_count3/length(bits3);
 t_new = (0:length(z_t1)-1)*dt; %define new time vector
 
 figure();
-stem(bits1);
+sgtitle('Original Bit Messages vs. Estimates');
+subplot(3,1,1),stem(bits1);
 hold on;
 stem(xn_tilda1);
-legend('bits','xn tilda');
+title('Message 1'),legend('bits','xn tilda');
+subplot(3,1,2),stem(bits2);
+hold on;
+stem(xn_tilda2);
+title('Message 2'),legend('bits','xn tilda');
+subplot(3,1,3),stem(bits3);
+hold on;
+stem(xn_tilda3);
+title('Message 3'),legend('bits','xn tilda');
 
 figure();
-plot(t_new,z_t2);
+sgtitle('Recovered Individual Signals');
+subplot(3,1,1),plot(t_new,z_t1),title('Message 1'),ylabel('z_1(t)'),xlabel('Time[s]');
+hold on
+stem(t_new,xn_spaced_new1);
+subplot(3,1,2),plot(t_new,z_t2),title('Message 2'),ylabel('z_2(t)'),xlabel('Time[s]');
 hold on
 stem(t_new,xn_spaced_new2);
+subplot(3,1,3),plot(t_new,z_t3),title('Message 3'),ylabel('z_3(t)'),xlabel('Time[s]');
+hold on
+stem(t_new,xn_spaced_new3);
 
 %% Recover Text Message
 for i = 1:length(xn_tilda1)
